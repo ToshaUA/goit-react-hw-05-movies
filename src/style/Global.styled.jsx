@@ -4,20 +4,19 @@ import styled from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
 body {
-  background:#ebecf0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.2px;
-  font-size: 16px;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-size: 1em;
+  line-height: 1.5;
+  color: rgb(0, 0, 0);
+  margin: 0;
+  background-image: linear-gradient(
+    1000deg,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
 }
 
 h1,
@@ -47,6 +46,4 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 25px;
-  padding: 20px;
 `;
