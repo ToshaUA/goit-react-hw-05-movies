@@ -38,7 +38,13 @@ export class App extends Component {
 
   handleSubmit = ({ queryValue }) => {
     const query = queryValue.toLowerCase().split(' ').join('+');
-    this.setState({ query, pageNum: 1, images: [] });
+    if (query !== this.state.query) {
+      this.setState({ query, pageNum: 1, images: [] });
+    } else if (this.state.query === '') {
+      return toast('No, no, enter what you are looking for!!!', {
+        icon: '👈',
+      });
+    }
   };
 
   onLoadMore = () => {
@@ -59,7 +65,7 @@ export class App extends Component {
           <Button onLoadMore={this.onLoadMore} />
         )}
         {isLoading && <Loader />}
-        <Toaster />
+        <Toaster position="top-right" reverseOrder={false} />
         <GlobalStyle />
       </Container>
     );
