@@ -13,6 +13,7 @@ export class App extends Component {
     images: [],
     isLoading: false,
     pageNum: 1,
+    total: '',
   };
 
   async componentDidUpdate(_, prevState) {
@@ -24,16 +25,15 @@ export class App extends Component {
         this.setState({ isLoading: true });
 
         const { pageNum } = this.state;
-        const images = await getImages(newQuery, pageNum);
+        const { total, hits } = await getImages(newQuery, pageNum);
 
         this.setState(prevState => ({
-          images: [...prevState.images, ...images],
+          images: [...prevState.images, ...hits],
+          total: total,
           isLoading: false,
         }));
       }
-    } catch {
-      toast.error('Something wrong :( Please reload this page');
-    }
+    } catch {}
   }
 
   handleSubmit = ({ queryValue }) => {
@@ -44,6 +44,8 @@ export class App extends Component {
       return toast('No, no, enter what you are looking for!!!', {
         icon: '👈',
       });
+    } else if (query === this.state.query) {
+      return toast.success('The images are already on the screen!!');
     }
   };
 
@@ -54,16 +56,17 @@ export class App extends Component {
   };
 
   render() {
-    const { images, isLoading } = this.state;
+    const { images, isLoading, query, total } = this.state;
     return (
       <Container>
         <Searchbar onSubmit={this.handleSubmit} />
 
-        {images.length > 0 && <ImageGallery images={images} />}
+        {images.length > 0 && query !== '' && <ImageGallery images={images} />}
 
-        {images.length > 0 && !isLoading && (
-          <Button onLoadMore={this.onLoadMore} />
-        )}
+        {images.length > 0 &&
+          query !== '' &&
+          !isLoading &&
+          images.length !== total && <Button onLoadMore={this.onLoadMore} />}
         {isLoading && <Loader />}
         <Toaster position="top-right" reverseOrder={false} />
         <GlobalStyle />
