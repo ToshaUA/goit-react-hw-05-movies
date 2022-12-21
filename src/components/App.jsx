@@ -1,76 +1,73 @@
 import { GlobalStyle, Container } from 'style/Global.styled';
 import { Searchbar } from './Searchbar/Searchbar';
 import { Button } from './Button/Button';
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { getImages } from './Api/Api';
 import { Loader } from './Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
 
-export class App extends Component {
-  state = {
-    query: '',
-    images: [],
-    isLoading: false,
-    pageNum: 1,
-    total: '',
-  };
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageNum, setPageNum] = useState(1);
+  const [total, setTotal] = useState('');
 
-  async componentDidUpdate(_, prevState) {
-    try {
-      const prevQuery = prevState.query;
-      const newQuery = this.state.query;
+  useEffect(() => {
+    if (query !== '') {
+      setIsLoading(true);
 
-      if (prevQuery !== newQuery || prevState.pageNum !== this.state.pageNum) {
-        this.setState({ isLoading: true });
+      const fetchImages = async () => {
+        const { total, hits: images } = await getImages(query, pageNum);
+        setImages(prevImages => [...prevImages, ...images]);
+        setTotal(total);
+        setIsLoading(false);
+      };
 
-        const { pageNum } = this.state;
-        const { total, hits } = await getImages(newQuery, pageNum);
+      fetchImages();
+    }
+  }, [pageNum, query]);
 
-        this.setState(prevState => ({
-          images: [...prevState.images, ...hits],
-          total: total,
-          isLoading: false,
-        }));
-      }
-    } catch {}
-  }
+  useEffect(() => {
+    if (total === 0) {
+      toast('No images', {
+        icon: '😞',
+      });
+    }
+  }, [total]);
 
-  handleSubmit = ({ queryValue }) => {
-    const query = queryValue.toLowerCase().split(' ').join('+');
-    if (query !== this.state.query) {
-      this.setState({ query, pageNum: 1, images: [] });
-    } else if (this.state.query === '') {
+  const handleSubmit = ({ queryValue }) => {
+    const newQuery = queryValue.toLowerCase().split(' ').join('+');
+    if (newQuery === query) {
+      return toast.success('The images are already on the screen!!');
+    } else if (newQuery === '') {
       return toast('No, no, enter what you are looking for!!!', {
         icon: '👈',
       });
-    } else if (query === this.state.query) {
-      return toast.success('The images are already on the screen!!');
     }
+
+    setQuery(newQuery);
+    setPageNum(1);
+    setImages([]);
   };
 
-  onLoadMore = () => {
-    this.setState(prevState => ({
-      pageNum: prevState.pageNum + 1,
-    }));
+  const onLoadMore = () => {
+    setPageNum(prevPageNum => prevPageNum + 1);
   };
 
-  render() {
-    const { images, isLoading, query, total } = this.state;
-    return (
-      <Container>
-        <Searchbar onSubmit={this.handleSubmit} />
+  return (
+    <Container>
+      <Searchbar onSubmit={handleSubmit} />
 
-        {images.length > 0 && query !== '' && <ImageGallery images={images} />}
+      {images.length > 0 && <ImageGallery images={images} />}
 
-        {images.length > 0 &&
-          query !== '' &&
-          !isLoading &&
-          images.length !== total && <Button onLoadMore={this.onLoadMore} />}
-        {isLoading && <Loader />}
-        <Toaster position="top-right" reverseOrder={false} />
-        <GlobalStyle />
-      </Container>
-    );
-  }
-}
+      {images.length > 0 && !isLoading && images.length !== total && (
+        <Button onLoadMore={onLoadMore} />
+      )}
+      {isLoading && <Loader />}
+      <Toaster position="top-right" reverseOrder={false} />
+      <GlobalStyle />
+    </Container>
+  );
+};
