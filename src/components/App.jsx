@@ -4,6 +4,7 @@ import { Button } from './Button/Button';
 import { useEffect, useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { getImages } from './Api/Api';
+import { usePrevious } from './Hooks/usePrevious';
 import { Loader } from './Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -56,11 +57,15 @@ export const App = () => {
     setPageNum(prevPageNum => prevPageNum + 1);
   };
 
+  const previousImages = usePrevious(images);
+
   return (
     <Container>
       <Searchbar onSubmit={handleSubmit} />
 
-      {images.length > 0 && <ImageGallery images={images} />}
+      {images.length > 0 && (
+        <ImageGallery images={images} prevImg={previousImages} />
+      )}
 
       {images.length > 0 && !isLoading && images.length !== total && (
         <Button onLoadMore={onLoadMore} />
