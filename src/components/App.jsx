@@ -3,8 +3,8 @@ import { Searchbar } from './Searchbar/Searchbar';
 import { Button } from './Button/Button';
 import { useEffect, useState } from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
-import { getImages } from './Api/Api';
-import { usePrevious } from './Hooks/usePrevious';
+import { getImages } from '../api/Api';
+import { usePrevious } from '../hooks/usePrevious';
 import { Loader } from './Loader/Loader';
 import toast, { Toaster } from 'react-hot-toast';
 
