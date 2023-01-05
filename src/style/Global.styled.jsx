@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
 body {
+  background:#ebecf0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -12,11 +13,11 @@ body {
   line-height: 1.5;
   color: rgb(0, 0, 0);
   margin: 0;
-  background-image: linear-gradient(
-    1000deg,
-    rgba(238, 174, 202, 1) 0%,
-    rgba(148, 187, 233, 1) 100%
-  );
+}
+
+html {
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 h1,
@@ -29,6 +30,10 @@ p {
   padding: 0;
   margin: 0;
 }
+
+a {
+    text-decoration: none;
+};
 
 ul {
   padding: 0;

@@ -1,78 +1,25 @@
-import { GlobalStyle, Container } from 'style/Global.styled';
-import { Searchbar } from './Searchbar/Searchbar';
-import { Button } from './Button/Button';
-import { useEffect, useState } from 'react';
-import { ImageGallery } from './ImageGallery/ImageGallery';
-import { getImages } from '../api/Api';
-import { usePrevious } from '../hooks/usePrevious';
-import { Loader } from './Loader/Loader';
-import toast, { Toaster } from 'react-hot-toast';
+import { Routes, Route } from 'react-router-dom';
+import { SharedLayout } from './SharedLayout/SharedLayout';
+import { lazy } from 'react';
+
+const Home = lazy(() => import('../pages/Home/Home'));
+const Movies = lazy(() => import('../pages/Movies/Movies'));
+const MovieDetails = lazy(() => import('../pages/MovieDetails/MovieDetails'));
+const Cast = lazy(() => import('./Cast/Cast'));
+const Reviews = lazy(() => import('./Reviews/Reviews'));
 
 export const App = () => {
-  const [query, setQuery] = useState('');
-  const [images, setImages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [pageNum, setPageNum] = useState(1);
-  const [total, setTotal] = useState('');
-
-  useEffect(() => {
-    if (query !== '') {
-      setIsLoading(true);
-
-      const fetchImages = async () => {
-        const { total, hits: images } = await getImages(query, pageNum);
-        setImages(prevImages => [...prevImages, ...images]);
-        setTotal(total);
-        setIsLoading(false);
-      };
-
-      fetchImages();
-    }
-  }, [pageNum, query]);
-
-  useEffect(() => {
-    if (total === 0) {
-      toast('No images', {
-        icon: '😞',
-      });
-    }
-  }, [total]);
-
-  const handleSubmit = ({ queryValue }) => {
-    const newQuery = queryValue.toLowerCase().split(' ').join('+');
-    if (newQuery === query) {
-      return toast.success('The images are already on the screen!!');
-    } else if (newQuery === '') {
-      return toast('No, no, enter what you are looking for!!!', {
-        icon: '👈',
-      });
-    }
-
-    setQuery(newQuery);
-    setPageNum(1);
-    setImages([]);
-  };
-
-  const onLoadMore = () => {
-    setPageNum(prevPageNum => prevPageNum + 1);
-  };
-
-  const previousImages = usePrevious(images);
-
   return (
-    <Container>
-      <Searchbar onSubmit={handleSubmit} />
-
-      {images.length > 0 && (
-        <ImageGallery images={images} prevImg={previousImages} />
-      )}
-
-      {images.length > 0 && !isLoading && images.length !== total && (
-        <Button onLoadMore={onLoadMore} />
-      )}
-      {isLoading && <Loader />}
-      <Toaster position="top-right" reverseOrder={false} />
-      <GlobalStyle />
-    </Container>
+    <Routes>
+      <Route path="/" element={<SharedLayout />}>
+        <Route index element={<Home />} />
+        <Route path="movies" element={<Movies />} />
+        <Route path="movies/:movieId" element={<MovieDetails />}>
+          <Route path="cast" element={<Cast />} />
+          <Route path="reviews" element={<Reviews />} />
+        </Route>
+        <Route path="*" element={<div>Not found</div>} />
+      </Route>
+    </Routes>
   );
 };
